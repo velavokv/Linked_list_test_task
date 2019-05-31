@@ -1,132 +1,75 @@
-#include <iostream>
-#include <QTextStream>
 
+#include <iostream>
+#include "Single_linked_list.h"
 using namespace std;
 
-struct lists
-{
-    int data;
-    lists *next;
-};
+int main(int argc, char *argv[]) {
+  try {
+    cout << " List commands:" << endl
+         << " 's' - show list" << endl
+         << " 'r' - reverse and show list" << endl
+         << " 't' - tail recursion and show list" << endl
+         << " 'n' - delete old and create new list" << endl
+         << " 'e' - exit the programm" << endl;
 
-lists* func_turn_back(lists* head);
-lists* initl(int data);
-void append(lists *lst,int data);
-void delet(lists *lst);
-void show(lists *lst);
+    int i = 1, comand, data;
+    char first_char;
+    string line_all;
+    Single_linked_list link_list;
+    do {
+      line_all.clear();
+      cout << "Set integer data " << i << " link list OR set command" << endl;
 
-int main()
-{
-    QTextStream qtin(stdin);
-    QTextStream qtout(stdout);
-    QString App, Yes_No;
-    bool *ok=NULL;
-
-    // INIT
-    lists *lst = initl(0);
-    do
-    {
-        qtout << endl;
-        Yes_No.clear();
-
-        int i=0;
-        qtout << "enter 's' - to show result"<< endl;
-
-        while(1)
-        {
-
-            App.clear();
-            qtout << "Input int data " << i << " element list" << endl;
-            qtin >> App;
-
-            if(App.at(0) == 's') break;
-            if(i==0) lst->data = App.toInt(ok);
-            else     append(lst,App.toInt(ok));
-            i++;
-
+      cin >> line_all;
+      first_char = line_all.at(0);
+      if ((first_char == '-') || ((first_char >= '0') && (first_char <= '9'))) {
+        link_list.append(atoi(&line_all.at(0)));
+        i++;
+        first_char = 'y';
+      } else {
+        switch (first_char) {
+        // yes to continue
+        case 'y':
+          break;
+        // exit this programm
+        case 'e':
+          return 0;
+        // reverse list
+        case 'r':
+          link_list.set_head(link_list.reverse(link_list.get_head()));
+        // show links list
+        case 's': {
+          link_list.show();
+          first_char = 'y';
+          break;
         }
+        // tail recursion list
+        case 't': {
+          link_list.set_head(link_list.tail_recursion(link_list.get_head()));
+          link_list.show();
+          first_char = 'y';
+          break;
+        }
+        // new list (old delete)
+        case 'n': {
+          link_list.~Single_linked_list();
+          i = 1;
+          first_char = 'y';
+          break;
+        }
+        default:
+          cout << "Enter 'y' to continue .." << endl;
+          line_all.clear();
+          cin >> line_all;
+          first_char = line_all.at(0);
+        }
+      }
 
-        qtout << "Linked list input: "<< endl;
-        show(lst);
-
-        lst = func_turn_back(lst);
-
-        qtout << "Linked list output: "<< endl;
-        show(lst);
-
-        delet(lst);
-
-        qtout << "Continue? (y/n): " << endl;
-        qtin >> Yes_No;
-
-    }while(Yes_No.at(0) == 'y');
-
-    return 0;
+    } while (first_char == 'y');
+  } catch (Single_linked_list::Exception exc) {
+    cout << "List is empty, cannot be processed medhod " << exc.name_method
+         << endl;
+  }
+  return 0;
 }
-
-
-lists* func_turn_back(lists* head)
-{
-    //  Функция принимает указатель на односвязный список
-    // и поворачивает указатели обратно, т.е. последний узел
-    // списка станет главным
-
-    lists* temp      = head;
-    lists* temp_next = head->next;
-    lists* temp_prev = NULL;
-
-    head->next = NULL;
-    while(temp_next)
-    {
-        temp_prev = temp;
-        temp = temp_next;
-        temp_next = temp->next;
-        temp->next = temp_prev;
-    }
-    temp->next = temp_prev;
-    return temp;
-}
-
-lists* initl(int data)
-{
-    lists *temp = new lists;
-    temp->data = data;
-    temp->next = NULL;
-    return temp;
-}
-
-void append(lists *lst,int data)
-{
-    lists *temp = new lists;
-    lists *p    = lst;
-    do
-    {
-        if(p->next == NULL) break;
-        p = p->next;
-    }while(p);
-
-    p->next    = temp;
-    temp->data = data;
-    temp->next = NULL;
-}
-
-void delet(lists *lst)
-{
-    lists *temp;
-    while(lst)
-    {
-        temp = lst->next;
-        delete lst;
-        lst = temp;
-    }
-}
-
-void show(lists *lst)
-{
-    lists *temp = lst;
-    do
-    {
-        cout << temp->data << endl;
-        temp = temp->next;
-    }while(temp);
-}
+//---------------------------------------------------------------------------
